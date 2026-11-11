@@ -1,96 +1,62 @@
-const categoryNames = {
-  family: "Freunde & Familie", hobby: "Hobby", nature: "Natur & Chillen",
-  faith: "Glaube & Religion", love: "Liebe", learning: "Lebenslanges Lernen"
-};
-
-document.querySelectorAll(".tile").forEach(tile => {
-  tile.addEventListener("click", () => {
-    document.querySelectorAll(".tile").forEach(t => t.classList.remove("active"));
-    tile.classList.add("active");
-    const id = tile.dataset.category;
-    const card = document.querySelector(`[data-card="${id}"]`);
-    if (card) {
-      document.querySelectorAll(".category-card").forEach(c => c.classList.remove("selected"));
-      card.classList.add("selected");
-      card.scrollIntoView({behavior:"smooth", block:"nearest"});
-    } else {
-      document.querySelectorAll(".category-card").forEach(c => c.classList.remove("selected"));
-      const publicPanel = document.getElementById("publicPanel");
-      publicPanel.insertAdjacentHTML("afterbegin", `<p class="selection-note">${categoryNames[id]} – weitere Angebote</p>`);
-      setTimeout(() => document.querySelector(".selection-note")?.remove(), 2600);
-    }
-  });
-});
-
-document.querySelectorAll("[data-back]").forEach(button => {
-  button.addEventListener("click", () => {
-    document.querySelectorAll(".tile").forEach(t => t.classList.remove("active"));
-    document.querySelector('.tile[data-category="family"]').classList.add("active");
-    document.querySelectorAll(".category-card").forEach(c => c.classList.remove("selected"));
-    document.querySelector('[data-card="family"]').classList.add("selected");
-  });
-});
-
-document.querySelectorAll(".phone-nav button").forEach(button => {
-  button.addEventListener("click", () => {
-    const target = {owner:"ownerPanel", public:"publicPanel", ai:"aiPanel"}[button.dataset.view];
-    document.getElementById(target).scrollIntoView({behavior:"smooth",block:"center"});
-  });
-});
-
-function appendBubble(container, text, kind="outgoing") {
-  const bubble = document.createElement("div");
-  bubble.className = `bubble ${kind}`;
-  bubble.textContent = text;
-  container.appendChild(bubble);
-  bubble.scrollIntoView({behavior:"smooth",block:"nearest"});
-}
-
-document.getElementById("ownerForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const input = document.getElementById("ownerInput");
-  if (!input.value.trim()) return;
-  appendBubble(document.getElementById("ownerHistory"), input.value.trim());
-  input.value = "";
-});
-
-document.getElementById("postForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const input = document.getElementById("postInput");
-  if (!input.value.trim()) return;
-  const post = document.createElement("article");
-  post.className = "post";
-  post.innerHTML = '<div class="votes"><button type="button">△</button><strong>1</strong><button type="button">▽</button></div><div></div>';
-  const content = post.lastElementChild;
-  const title = document.createElement("h3");
-  title.textContent = input.value.trim();
-  const meta = document.createElement("p");
-  meta.textContent = "u/du · 0 Kommentare";
-  content.append(title,meta);
-  document.querySelector(".public-panel .compose").before(post);
-  input.value = "";
-});
-
-const aiQuestions = [
-  "Was gibt dir im Alltag ein gutes Gefühl?",
-  "Mit wem kannst du besonders gut du selbst sein?",
-  "Was möchtest du gerne einmal erreichen?",
-  "Wofür bist du heute dankbar?"
-];
-let aiQuestionIndex = 0;
-document.getElementById("aiForm").addEventListener("submit", e => {
-  e.preventDefault();
-  const input = document.getElementById("aiInput");
-  if (!input.value.trim()) return;
-  appendBubble(document.getElementById("aiContent"), input.value.trim());
-  input.value = "";
-  const response = aiQuestions[aiQuestionIndex++ % aiQuestions.length];
-  setTimeout(() => appendBubble(document.getElementById("aiContent"), response, "incoming"), 250);
-});
-document.getElementById("againButton").addEventListener("click", () => {
-  const content = document.getElementById("aiContent");
-  appendBubble(content, aiQuestions[aiQuestionIndex++ % aiQuestions.length], "incoming");
-});
-document.getElementById("homeButton").addEventListener("click", () => {
-  window.scrollTo({top:0,behavior:"smooth"});
-});
+*{box-sizing:border-box}
+:root{--ink:#28264f;--purple:#5c50b5;--line:#8e8d88;--paper:#fffefa;--muted:#f1efe8}
+body{margin:0;padding:17px 24px 28px;background:#fffefa;color:#282828;font-family:Arial,Helvetica,sans-serif}
+button,input{font:inherit}
+button{cursor:pointer}
+.topbar{border:2px solid #5d51b4;border-radius:15px;background:#d4d1f4;color:#25234e;text-align:center;padding:8px 12px;margin:0 0 16px}
+.topbar h1{font-size:clamp(20px,2.3vw,33px);line-height:1.2;margin:0;font-weight:800}
+.layout{display:grid;grid-template-columns:minmax(235px,315px) minmax(340px,1fr) minmax(470px,1.55fr);gap:25px;max-width:1600px;margin:auto;align-items:stretch}
+.left-column,.middle-column,.right-column{min-width:0;display:flex;flex-direction:column;gap:17px}
+.panel,.category-card{border:1.7px solid var(--line);border-radius:14px;background:#fff}
+.phone{border:3px solid #484848;border-radius:34px;max-width:270px;width:100%;height:605px;margin:0 auto;padding:9px 11px 13px;display:flex;flex-direction:column;align-items:center}
+.speaker{height:8px;width:60px;background:#b8b6ae;border-radius:8px;margin:0 auto 15px}
+.phone h2{font-size:19px;margin:0 0 10px}
+.tile-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;width:100%}
+.tile{height:96px;border:2px solid;border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-weight:700;font-size:14px;text-align:center;position:relative;transition:transform .15s,box-shadow .15s}
+.tile:hover,.tile.active{transform:translateY(-2px);box-shadow:0 3px 0 #00000012}
+.tile-icon{font-size:29px;line-height:1.1;font-weight:400}
+.family{background:#fff0e9;border-color:#a64f38;color:#542a20}.hobby{background:#e0f4ed;border-color:#28846e;color:#143d34}
+.nature{background:#edf6df;border-color:#5d8c32;color:#29461e}.faith{background:#eeebff;border-color:#5d51b4;color:#27234f}
+.love{background:#faeaf0;border-color:#b04b6b;color:#61283d}.learning{background:#fff0dc;border-color:#c08329;color:#5b3910}
+.phone-nav{width:100%;display:grid;gap:8px;margin-top:19px}
+.phone-nav button{border:1.6px solid #888;border-radius:22px;background:#d5d3ca;padding:9px 7px;font-weight:700;font-size:15px;color:#303030}
+.phone-nav button:nth-child(2){background:#c4dcf4;border-color:#3676b5;color:#12395c}
+.phone-nav button:nth-child(3){background:#ffd080;border-color:#b77a20;color:#51330b}
+.dots{display:flex;gap:9px;margin-top:auto}.dots i{width:11px;height:11px;background:#b9b9b3;border-radius:50%}
+.howto{padding:14px 15px 12px}.howto h2{font-size:18px;margin:0 0 13px}.howto ol{list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.howto li{display:flex;align-items:center;gap:9px;font-size:14px}.howto li b{background:#df4e54;color:white;border-radius:50%;width:23px;height:23px;display:grid;place-items:center;flex:none}
+.howto small{display:block;margin-top:14px;font-size:12px}
+.category-grid{display:grid;grid-template-columns:1fr 1fr;gap:17px}
+.category-card{overflow:hidden;min-height:205px;transition:box-shadow .2s}.category-card.selected{box-shadow:0 0 0 2px #7772}
+.card-head,.section-head{height:38px;border-radius:12px 12px 0 0;border:0;border-bottom:1px solid #888;display:flex;align-items:center;gap:10px;padding:0 12px;font-size:16px;font-weight:700;text-align:left;width:100%}
+.card-head{border-radius:12px 12px 0 0}
+.coral{background:#f5c6b4;color:#542b1e;border:1.5px solid #a75039}.mint{background:#a9e5d3;color:#173e34;border:1.5px solid #25836d}
+.green{background:#c7e3a3;color:#29451c;border:1.5px solid #5c8b31}.lavender{background:#d2cdf4;color:#292550;border:1.5px solid #5b50b2}
+.card-content{padding:14px 13px}.card-content h3{font-size:15px;margin:2px 0 14px}.card-content ul{padding-left:14px;margin:0;display:grid;gap:12px;font-size:13px;line-height:1.3}
+.public-panel{padding:0 12px 12px;flex:1;min-height:430px}.section-head{margin:0 -12px 15px;padding:0 12px;font-size:16px}
+.blue{background:#b9d5f2;color:#12385b;border:1.5px solid #3479b8}.gray{background:#d5d3ca;color:#333;border:1.5px solid #888}.orange{background:#ffd083;color:#56350b;border:1.5px solid #bd8123}
+.post{border:1.4px solid #9a9992;border-radius:10px;background:#f2f0e9;display:grid;grid-template-columns:42px 1fr;gap:5px;padding:9px 8px;margin:10px 0}
+.post h3{font-size:15px;margin:4px 0 7px}.post p{font-size:12px;margin:0 0 8px}.post small{font-size:12px}
+.votes{display:flex;flex-direction:column;align-items:center;justify-content:space-between;color:#123f68}.votes button{background:none;border:0;color:#21639a;font-size:23px;line-height:1;padding:0}
+.compose,.message-form{display:flex;gap:7px;margin-top:13px}.compose input,.message-form input{min-width:0;flex:1;border:1.4px solid #999;border-radius:22px;background:#f2f0e9;padding:7px 12px;font-size:13px}
+.compose button,.message-form button{border:1px solid #aaa;border-radius:20px;padding:6px 12px;background:#eeeae0;display:none}
+.owner-panel{padding:0 16px 15px;min-height:350px;display:flex;flex-direction:column}
+.owner-panel .section-head,.ai-panel .section-head{margin-left:-16px;margin-right:-16px}
+.chat-history{display:flex;flex-direction:column;gap:9px;flex:1}
+.bubble{border:1.7px solid #5d51b4;border-radius:15px;background:#eeedfc;padding:8px 12px;font-size:14px;line-height:1.4;max-width:76%;width:fit-content;color:#29264e}
+.incoming{align-self:flex-start;background:#f2f0e9;border-color:#99958c;color:#3a3834}
+.outgoing{align-self:flex-end}
+.thanks{max-width:70%}
+.message-form{margin-top:15px}.message-form input{font-size:13px}
+.ai-panel{padding:0 16px 15px;min-height:535px;display:flex;flex-direction:column}
+.ai-content{display:flex;flex-direction:column;gap:10px;flex:1}
+.ai-content .bubble{max-width:80%}
+.plot-twist{border:2px solid #bd7c1c;border-radius:14px;background:#ffd083;padding:10px 14px;margin-top:5px;color:#57380e}
+.plot-twist h2{font-size:22px;margin:0 0 8px}.plot-twist p{font-size:15px;line-height:1.5;margin:0}
+.ai-actions{display:flex;gap:12px;margin-top:8px;flex-wrap:wrap}
+.ai-actions button{border:1.7px solid #b77a20;border-radius:22px;padding:9px 18px;background:#fff0dc;font-weight:700;color:#50330e}
+.ai-actions button+button{border-color:#999;background:#f1efe8;color:#333}
+.ai-form{margin-top:12px}.ai-form button{display:block}
+@media(max-width:1100px){.layout{grid-template-columns:260px 1fr}.right-column{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr}.phone{height:570px}.owner-panel,.ai-panel{min-height:500px}}
+@media(max-width:720px){body{padding:10px}.layout{display:flex;flex-direction:column;gap:14px}.left-column{display:contents}.phone{order:0;height:auto;max-width:none;border-radius:22px}.tile{height:82px}.phone-nav{grid-template-columns:1fr 1fr 1fr;margin-top:12px}.phone-nav button{font-size:12px}.dots{margin-top:12px}.howto{order:4}.middle-column{order:1}.right-column{order:2;display:flex}.category-grid{gap:10px}.category-card{min-height:190px}.card-content ul{gap:8px}.public-panel{min-height:0}.owner-panel,.ai-panel{min-height:0}.bubble{max-width:90%}.section-head{font-size:14px}}
+@media(max-width:390px){.category-grid{grid-template-columns:1fr}.phone-nav{grid-template-columns:1fr}.tile{height:88px}}
