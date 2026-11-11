@@ -1,0 +1,96 @@
+const categoryNames = {
+  family: "Freunde & Familie", hobby: "Hobby", nature: "Natur & Chillen",
+  faith: "Glaube & Religion", love: "Liebe", learning: "Lebenslanges Lernen"
+};
+
+document.querySelectorAll(".tile").forEach(tile => {
+  tile.addEventListener("click", () => {
+    document.querySelectorAll(".tile").forEach(t => t.classList.remove("active"));
+    tile.classList.add("active");
+    const id = tile.dataset.category;
+    const card = document.querySelector(`[data-card="${id}"]`);
+    if (card) {
+      document.querySelectorAll(".category-card").forEach(c => c.classList.remove("selected"));
+      card.classList.add("selected");
+      card.scrollIntoView({behavior:"smooth", block:"nearest"});
+    } else {
+      document.querySelectorAll(".category-card").forEach(c => c.classList.remove("selected"));
+      const publicPanel = document.getElementById("publicPanel");
+      publicPanel.insertAdjacentHTML("afterbegin", `<p class="selection-note">${categoryNames[id]} – weitere Angebote</p>`);
+      setTimeout(() => document.querySelector(".selection-note")?.remove(), 2600);
+    }
+  });
+});
+
+document.querySelectorAll("[data-back]").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll(".tile").forEach(t => t.classList.remove("active"));
+    document.querySelector('.tile[data-category="family"]').classList.add("active");
+    document.querySelectorAll(".category-card").forEach(c => c.classList.remove("selected"));
+    document.querySelector('[data-card="family"]').classList.add("selected");
+  });
+});
+
+document.querySelectorAll(".phone-nav button").forEach(button => {
+  button.addEventListener("click", () => {
+    const target = {owner:"ownerPanel", public:"publicPanel", ai:"aiPanel"}[button.dataset.view];
+    document.getElementById(target).scrollIntoView({behavior:"smooth",block:"center"});
+  });
+});
+
+function appendBubble(container, text, kind="outgoing") {
+  const bubble = document.createElement("div");
+  bubble.className = `bubble ${kind}`;
+  bubble.textContent = text;
+  container.appendChild(bubble);
+  bubble.scrollIntoView({behavior:"smooth",block:"nearest"});
+}
+
+document.getElementById("ownerForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const input = document.getElementById("ownerInput");
+  if (!input.value.trim()) return;
+  appendBubble(document.getElementById("ownerHistory"), input.value.trim());
+  input.value = "";
+});
+
+document.getElementById("postForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const input = document.getElementById("postInput");
+  if (!input.value.trim()) return;
+  const post = document.createElement("article");
+  post.className = "post";
+  post.innerHTML = '<div class="votes"><button type="button">△</button><strong>1</strong><button type="button">▽</button></div><div></div>';
+  const content = post.lastElementChild;
+  const title = document.createElement("h3");
+  title.textContent = input.value.trim();
+  const meta = document.createElement("p");
+  meta.textContent = "u/du · 0 Kommentare";
+  content.append(title,meta);
+  document.querySelector(".public-panel .compose").before(post);
+  input.value = "";
+});
+
+const aiQuestions = [
+  "Was gibt dir im Alltag ein gutes Gefühl?",
+  "Mit wem kannst du besonders gut du selbst sein?",
+  "Was möchtest du gerne einmal erreichen?",
+  "Wofür bist du heute dankbar?"
+];
+let aiQuestionIndex = 0;
+document.getElementById("aiForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const input = document.getElementById("aiInput");
+  if (!input.value.trim()) return;
+  appendBubble(document.getElementById("aiContent"), input.value.trim());
+  input.value = "";
+  const response = aiQuestions[aiQuestionIndex++ % aiQuestions.length];
+  setTimeout(() => appendBubble(document.getElementById("aiContent"), response, "incoming"), 250);
+});
+document.getElementById("againButton").addEventListener("click", () => {
+  const content = document.getElementById("aiContent");
+  appendBubble(content, aiQuestions[aiQuestionIndex++ % aiQuestions.length], "incoming");
+});
+document.getElementById("homeButton").addEventListener("click", () => {
+  window.scrollTo({top:0,behavior:"smooth"});
+});
