@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#d5d2f5">
+  <title>Sinn-Kompass – die App zum Sinn des Lebens</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>SINN-KOMPASS: die App zum Sinn des Lebens</h1>
+  </header>
+
+  <main class="layout">
+    <aside class="left-column">
+      <section class="phone panel" aria-label="Startseite">
+        <div class="speaker"></div>
+        <h2>Was gibt dir Sinn?</h2>
+        <div class="tile-grid">
+          <button class="tile family active" data-category="family"><span class="tile-icon">♧</span><span>Freunde &amp;<br>Familie</span></button>
+          <button class="tile hobby" data-category="hobby"><span class="tile-icon">＋⚙</span><span>Hobby</span></button>
+          <button class="tile nature" data-category="nature"><span class="tile-icon">♧</span><span>Natur &amp;<br>Chillen</span></button>
+          <button class="tile faith" data-category="faith"><span class="tile-icon">＋</span><span>Glaube &amp;<br>Religion</span></button>
+          <button class="tile love" data-category="love"><span class="tile-icon">♡</span><span>Liebe</span></button>
+          <button class="tile learning" data-category="learning"><span class="tile-icon">◫</span><span>Lebenslanges<br>Lernen</span></button>
+        </div>
+        <nav class="phone-nav">
+          <button data-view="owner">Chat mit dem Inhaber</button>
+          <button data-view="public">Öffentlicher Chat</button>
+          <button data-view="ai">KI-Sinn-Chat</button>
+        </nav>
+        <div class="dots"><i></i><i></i><i></i></div>
+      </section>
+
+      <section class="panel howto">
+        <h2>So bedienst du die App</h2>
+        <ol>
+          <li><b>1</b><span>Kachel antippen</span></li>
+          <li><b>2</b><span>Kachel mit &gt; = Unterseite</span></li>
+          <li><b>3</b><span>Chat mit dem Inhaber</span></li>
+          <li><b>4</b><span>Pfeil &lt; = zurück zum Start</span></li>
+          <li><b>5</b><span>Öffentlicher Chat (Reddit)</span></li>
+          <li><b>6</b><span>KI-Sinn-Chat mit Plottwist</span></li>
+        </ol>
+        <small>Liebe und Lernen: weitere Angebote</small>
+      </section>
+    </aside>
+
+    <section class="middle-column">
+      <div class="category-grid" id="categoryGrid">
+        <article class="category-card family-card selected" data-card="family">
+          <button class="card-head coral" data-back>‹ <span>Freunde &amp; Familie</span></button>
+          <div class="card-content"><h3>Warum hilft mir das?</h3><ul><li>Du bist nicht allein</li><li>Zusammen lachen und reden</li><li>Menschen, die dich halten</li></ul></div>
+        </article>
+        <article class="category-card hobby-card" data-card="hobby">
+          <button class="card-head mint" data-back>‹ <span>Hobby</span></button>
+          <div class="card-content"><h3>Warum hilft mir das?</h3><ul><li>Etwas, das dir Freude macht</li><li>Du wächst an deinen Zielen</li><li>Zeit, in der du dich spürst</li></ul></div>
+        </article>
+        <article class="category-card nature-card" data-card="nature">
+          <button class="card-head green" data-back>‹ <span>Natur &amp; Chillen</span></button>
+          <div class="card-content"><h3>Warum hilft mir das?</h3><ul><li>Ruhe für den Kopf</li><li>Abstand vom Stress</li><li>Zeit zum Nachdenken</li></ul></div>
+        </article>
+        <article class="category-card faith-card" data-card="faith">
+          <button class="card-head lavender" data-back>‹ <span>Glaube &amp; Religion</span></button>
+          <div class="card-content"><h3>Warum hilft mir das?</h3><ul><li>Antworten auf große Fragen</li><li>Hoffnung und Halt</li><li>Gemeinschaft mit anderen</li></ul></div>
+        </article>
+      </div>
+
+      <section class="panel public-panel" id="publicPanel">
+        <div class="section-head blue">‹ <span>Öffentlicher Chat: r/Sinnsuche</span></div>
+        <div class="post">
+          <div class="votes"><button aria-label="Upvote">△</button><strong>42</strong><button aria-label="Downvote">▽</button></div>
+          <div><h3>Was gibt euch im Alltag Sinn?</h3><p><b>u/Lena_8b</b> · 12 Kommentare</p><small>› &nbsp;u/Max: Bei mir ist es Fußball mit dem Team.</small></div>
+        </div>
+        <div class="post">
+          <div class="votes"><button aria-label="Upvote">△</button><strong>27</strong><button aria-label="Downvote">▽</button></div>
+          <div><h3>Habt ihr manchmal Zweifel am Sinn?</h3><p><b>u/Jonas_k</b> · 8 Kommentare</p><small>› &nbsp;u/Sara: Ja, Reden mit Freunden hilft mir.</small></div>
+        </div>
+        <div class="post">
+          <div class="votes"><button aria-label="Upvote">△</button><strong>35</strong><button aria-label="Downvote">▽</button></div>
+          <div><h3>Gibt es einen Sinn für alle?</h3><p><b>u/Emre_9</b> · 15 Kommentare</p><small>› &nbsp;u/Mia: Jeder findet seinen eigenen.</small></div>
+        </div>
+        <form class="compose" id="postForm"><input id="postInput" placeholder="Eigenen Beitrag schreiben ..." aria-label="Eigenen Beitrag schreiben"><button type="submit" aria-label="Beitrag veröffentlichen">➤</button></form>
+      </section>
+    </section>
+
+    <section class="right-column">
+      <section class="panel owner-panel" id="ownerPanel">
+        <div class="section-head gray">‹ <span>Chat mit dem Inhaber</span></div>
+        <div class="chat-history" id="ownerHistory">
+          <div class="bubble incoming">Hi! Was gibt dir persönlich Sinn im Leben?</div>
+          <div class="bubble outgoing">Hi! Für mich sind das Freunde und Familie. Bei ihnen weiß ich, dass ich nicht allein bin.</div>
+          <div class="bubble outgoing">Auch mein Hobby: Wenn ich übe, merke ich, dass ich besser werde. Das gibt mir ein gutes Gefühl.</div>
+          <div class="bubble outgoing">In der Natur ordne ich meine Gedanken. Und Glaube gibt vielen Menschen Hoffnung und Halt.</div>
+          <div class="bubble incoming">Gibt es sonst noch irgendetwas, was Ihnen persönlich Sinn gibt im Leben?</div>
+          <div class="bubble outgoing">Mein Hobby, Fußball, macht mir Spaß, sobald ich merke, dass ich übe und besser werde.</div>
+          <div class="bubble outgoing">Doch ist eine Sache wichtig: Ich finde, dass jeder seinen Sinn selber findet und dass man niemanden nachmachen soll. Die Suche nach dem Sinn ist ein langer Weg und jeder soll seinen eigenen Weg gehen.</div>
+          <div class="bubble incoming thanks">Vielen Dank für Ihre Antworten und Ihre Zeit!</div>
+        </div>
+        <form class="message-form" id="ownerForm"><input id="ownerInput" placeholder="Nachricht schreiben ..." aria-label="Nachricht schreiben"><button type="submit">Senden</button></form>
+      </section>
+
+      <section class="panel ai-panel" id="aiPanel">
+        <div class="section-head orange">‹ <span>KI-Sinn-Chat</span></div>
+        <div class="ai-content" id="aiContent">
+          <div class="bubble incoming">Hallo! Ich bin die Sinn-KI. Ich finde mit dir heraus, was dich im Leben trägt. Was machst du gern?</div>
+          <div class="bubble outgoing">Ich zocke gern und treffe Freunde.</div>
+          <div class="bubble incoming">Wann fühlst du dich am glücklichsten?</div>
+          <div class="bubble outgoing">Wenn wir zusammen lachen.</div>
+          <div class="bubble incoming">Ich merke: Gemeinschaft gibt dir Sinn!</div>
+          <div class="plot-twist"><h2>Plottwist!</h2><p>Jeder deiner Tage hat einen Sinn, auch wenn du ihn gerade nicht verstehst. Du erkennst ihn oft erst später.</p></div>
+          <div class="ai-actions"><button id="againButton">Nochmal fragen</button><button id="homeButton">Zur Startseite</button></div>
+        </div>
+        <form class="message-form ai-form" id="aiForm"><input id="aiInput" placeholder="Frag die Sinn-KI ..." aria-label="Frag die Sinn-KI"><button type="submit">Senden</button></form>
+      </section>
+    </section>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
