@@ -1,121 +1,1479 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#d5d2f5">
-  <title>Sinn-Kompass – die App zum Sinn des Lebens</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#8b86e0">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="whyApp">
+<meta name="description" content="whyApp – die App zum Sinn des Lebens. Sechs Themen, ein Chat mit dem Inhaber, ein öffentlicher Chat und die Sinnes-KI mit Plottwist.">
+<title>whyApp – die App zum Sinn des Lebens</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --ink: #211f33;
+    --muted: #605d78;
+    --bg: #fdfbf6;
+    --line: #2c2a44;
+    --purple: #b9b6ec;
+    --salmon: #f7c4b4;
+    --mint: #c3e9d8;
+    --green: #d9edc5;
+    --lav: #dedcf8;
+    --pink: #fbdbe8;
+    --cream: #faedcb;
+    --orange: #f8ca7c;
+    --blue: #d2e4f8;
+    --grey: #e6e1d7;
+    --red: #e2564a;
+    --r: 18px;
+    --shadow: 0 8px 22px -14px rgba(33, 31, 51, .55);
+  }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+  }
+
+  .app { max-width: 920px; margin: 0 auto; padding: 0 14px 64px; }
+
+  /* ---------- Kopfzeile ---------- */
+  .topbar {
+    position: sticky;
+    top: 8px;
+    z-index: 20;
+    display: grid;
+    grid-template-columns: 42px 1fr 42px;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px 12px;
+    border: 1.5px solid var(--line);
+    border-radius: 22px;
+    background: linear-gradient(120deg, #8b86e0, #7fb0e6);
+    color: #fff;
+    box-shadow: 0 14px 26px -20px rgba(33, 31, 51, .95);
+  }
+
+  .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+
+  .brand-mark {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 1.5px solid rgba(255, 255, 255, .85);
+    display: grid;
+    place-items: center;
+  }
+  .brand-mark svg { width: 18px; height: 18px; }
+
+  .topbar h1 {
+    margin: 0;
+    font-size: clamp(.95rem, 4.2vw, 1.35rem);
+    letter-spacing: .02em;
+    line-height: 1.1;
+    text-shadow: 0 1px 0 rgba(44, 42, 68, .38);
+  }
+  .brand p {
+    margin: 2px 0 0;
+    font-size: .7rem;
+    font-weight: 600;
+    opacity: .95;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .icon-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-size: 1.15rem;
+    font-weight: 800;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: transform .15s ease, opacity .15s ease;
+  }
+  .icon-btn:hover:not(:disabled) { transform: translateY(-1px); }
+  .icon-btn:disabled { opacity: .38; cursor: default; }
+
+  /* ---------- Ansichten ---------- */
+  main { margin-top: 20px; }
+  .view { display: none; }
+  .view.active { display: block; animation: fade .26s ease both; }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(7px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .hero h2 {
+    margin: .25rem 0 .45rem;
+    font-size: clamp(1.5rem, 6vw, 2.1rem);
+    line-height: 1.1;
+    letter-spacing: -.01em;
+  }
+  .eyebrow {
+    margin: 0;
+    font-size: .72rem;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    font-weight: 800;
+    color: #7b76c8;
+  }
+  .lead { margin: 0; color: var(--muted); max-width: 58ch; font-size: .97rem; }
+
+  /* ---------- Kacheln ---------- */
+  .tiles {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 14px;
+    margin-top: 24px;
+  }
+  @media (min-width: 700px) {
+    .tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  .tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-height: 124px;
+    padding: 16px 14px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r);
+    background: var(--c, #fff);
+    color: var(--ink);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform .16s ease, box-shadow .16s ease;
+  }
+  .tile:hover { transform: translateY(-3px); box-shadow: 0 16px 26px -18px rgba(33, 31, 51, .8); }
+  .tile:active { transform: translateY(0) scale(.99); }
+
+  .tile-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    border: 1px solid rgba(44, 42, 68, .25);
+    background: rgba(255, 255, 255, .65);
+    color: var(--ink);
+  }
+  .tile-icon svg { width: 24px; height: 24px; }
+
+  .tile-title { margin-top: auto; font-weight: 800; font-size: .96rem; line-height: 1.2; }
+
+  .nr {
+    position: absolute;
+    top: -10px;
+    left: -8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--red);
+    color: #fff;
+    font-size: .76rem;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 0 0 3px var(--bg);
+  }
+
+  .tile-go {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: 1.2px solid rgba(44, 42, 68, .45);
+    background: rgba(255, 255, 255, .6);
+    display: grid;
+    place-items: center;
+    font-size: .95rem;
+    line-height: 1;
+  }
+
+  /* ---------- Menü-Zeilen ---------- */
+  .menu { display: grid; gap: 12px; margin-top: 22px; }
+
+  .menu-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 12px 18px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--c, #fff);
+    color: var(--ink);
+    font: inherit;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform .16s ease;
+  }
+  .menu-item:hover { transform: translateX(3px); }
+
+  .menu-ico {
+    flex: 0 0 auto;
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, .6);
+    border: 1px solid rgba(44, 42, 68, .22);
+  }
+  .menu-ico svg { width: 17px; height: 17px; }
+
+  .menu-label { flex: 1; }
+  .menu-label small { display: block; font-size: .72rem; font-weight: 600; opacity: .7; }
+  .menu-item .arrow { font-weight: 800; opacity: .55; }
+
+  .footnote { margin: 20px 0 0; font-size: .77rem; color: var(--muted); }
+
+  .heart { margin-top: 20px; color: var(--red); }
+  .heart svg { width: 32px; height: 32px; }
+
+  .hero-text { min-width: 0; }
+  .hero-art { margin-top: 20px; }
+  .art-frame {
+    width: min(230px, 64%);
+    overflow: hidden;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r);
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+  .art-frame svg { display: block; width: 100%; height: auto; }
+
+  @media (min-width: 700px) {
+    .hero { display: grid; grid-template-columns: 1.5fr auto; gap: 24px; align-items: start; }
+    .hero-art { margin-top: 34px; }
+  }
+
+  /* ---------- Kopfleiste der Unterseiten ---------- */
+  .bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px 10px 10px;
+    margin-bottom: 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--c, var(--lav));
+    box-shadow: var(--shadow);
+  }
+  .bar h2 { margin: 0; font-size: 1rem; line-height: 1.2; }
+  .bar .sub { margin: 1px 0 0; font-size: .73rem; font-weight: 600; opacity: .75; }
+
+  .bar-back {
+    flex: 0 0 auto;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1.2px solid rgba(44, 42, 68, .45);
+    background: rgba(255, 255, 255, .7);
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+    font-weight: 800;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .bar-back:hover { background: #fff; }
+
+  /* ---------- Karten ---------- */
+  .card {
+    padding: 18px;
+    border: 1.5px solid var(--line);
+    border-radius: var(--r);
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+  .card + .card { margin-top: 14px; }
+  .card-kicker { margin: 0 0 10px; font-size: .95rem; font-weight: 800; }
+
+  .why { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .why li { position: relative; padding-left: 22px; }
+  .why li::before {
+    content: "";
+    position: absolute;
+    left: 4px;
+    top: .6em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #c9c5f0;
+  }
+  .tip { background: #fffdf2; }
+  .tip p { margin: 0; color: #3b3852; font-size: .93rem; }
+
+  .row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+
+  .btn {
+    padding: 11px 18px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: transform .15s ease, filter .15s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn.primary {
+    border-color: var(--line);
+    background: linear-gradient(120deg, #8b86e0, #7fb0e6);
+    color: #fff;
+  }
+
+  .notice {
+    margin: 0 0 14px;
+    padding: 9px 13px;
+    border: 1.3px dashed rgba(44, 42, 68, .35);
+    border-radius: 12px;
+    background: #fff8e8;
+    color: #5a5340;
+    font-size: .78rem;
+  }
+
+  /* ---------- Chats ---------- */
+  .chat-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1.5px solid var(--line);
+    border-radius: 20px;
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+  .chat-card.ki { border-radius: 20px; }
+
+  .chat-log {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: min(56vh, 430px);
+    padding: 14px;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+  }
+
+  .msg {
+    max-width: 84%;
+    padding: 10px 14px;
+    border: 1.2px solid rgba(44, 42, 68, .32);
+    border-radius: 16px;
+    font-size: .93rem;
+    overflow-wrap: anywhere;
+  }
+  .msg.bot { align-self: flex-start; background: #f2f0ea; border-bottom-left-radius: 6px; }
+  .msg.me { align-self: flex-end; background: var(--lav); border-bottom-right-radius: 6px; }
+
+  .plot {
+    margin-top: 4px;
+    padding: 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    background: linear-gradient(150deg, #fbd695, #f8c877);
+    box-shadow: var(--shadow);
+    animation: fade .3s ease both;
+  }
+  .plot h3 { margin: 0 0 6px; font-size: 1.02rem; font-weight: 900; }
+  .plot p { margin: 0; font-size: .92rem; }
+  .plot .plot-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .plot .plot-actions .btn { padding: 9px 15px; font-size: .85rem; }
+
+  .send:disabled { opacity: .45; cursor: default; }
+
+  .typing { display: flex; align-items: center; gap: 5px; padding: 14px 16px; }
+  .typing span { width: 7px; height: 7px; border-radius: 50%; background: #8f8ba8; animation: typing-dot 1.2s infinite ease-in-out; }
+  .typing span:nth-child(2) { animation-delay: .18s; }
+  .typing span:nth-child(3) { animation-delay: .36s; }
+  @keyframes typing-dot {
+    0%, 80%, 100% { opacity: .25; transform: translateY(0); }
+    40% { opacity: 1; transform: translateY(-2px); }
+  }
+
+  .ki-note { margin: 10px 2px 0; font-size: .75rem; line-height: 1.45; color: var(--muted); }
+  .ki-note.warn { color: #8a4a2a; }
+
+  .chat-form {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    border-top: 1.5px solid rgba(44, 42, 68, .22);
+    background: #fbfaf6;
+  }
+  .chat-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 12px 16px;
+    border: 1.4px solid rgba(44, 42, 68, .4);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+  }
+  .chat-form input:focus-visible { outline: 2px solid #7b76c8; outline-offset: 1px; }
+
+  .send {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    border: 1.5px solid var(--line);
+    border-radius: 50%;
+    background: linear-gradient(120deg, #8b86e0, #7fb0e6);
+    color: #fff;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+  .send svg { width: 20px; height: 20px; }
+  .send:hover { filter: brightness(1.06); }
+
+  /* ---------- Öffentlicher Chat ---------- */
+  .post-list { display: grid; gap: 14px; }
+
+  .post {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 12px;
+    padding: 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+
+  .vote {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    height: fit-content;
+    padding: 6px 2px;
+    border: 1.2px solid rgba(44, 42, 68, .35);
+    border-radius: 12px;
+    background: #fbfaf6;
+    color: #4a4763;
+    font: inherit;
+    font-size: .76rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .vote .arrow { font-size: .85rem; line-height: 1; }
+  .vote.on { background: var(--lav); border-color: #6f6ac9; color: #2a2740; }
+
+  .post h3 { margin: 0 0 3px; font-size: .97rem; line-height: 1.3; }
+  .post-meta { margin: 0; font-size: .75rem; color: var(--muted); }
+
+  .comments-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 9px;
+    padding: 0;
+    border: none;
+    background: none;
+    color: #5b56b5;
+    font: inherit;
+    font-size: .79rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .comments-toggle:hover { text-decoration: underline; }
+
+  .comments {
+    display: grid;
+    gap: 7px;
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(44, 42, 68, .15);
+  }
+  .comment { margin: 0; font-size: .82rem; color: #3a3752; }
+  .comment strong { font-weight: 800; }
+  .more { margin: 0; font-size: .76rem; color: var(--muted); font-style: italic; }
+
+  .comment-form { display: flex; gap: 6px; margin-top: 2px; }
+  .comment-form input {
+    flex: 1;
+    min-width: 0;
+    padding: 8px 12px;
+    border: 1.2px solid rgba(44, 42, 68, .3);
+    border-radius: 999px;
+    font: inherit;
+    font-size: .82rem;
+  }
+  .comment-form button {
+    padding: 0 13px;
+    border: 1.2px solid var(--line);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-size: .77rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .new-post { display: flex; gap: 8px; margin-top: 16px; }
+  .new-post input {
+    flex: 1;
+    min-width: 0;
+    padding: 13px 16px;
+    border: 1.4px solid rgba(44, 42, 68, .4);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-size: .9rem;
+  }
+  .new-post input:focus-visible { outline: 2px solid #7b76c8; outline-offset: 1px; }
+
+  /* ---------- Hilfe ---------- */
+  .steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 11px; }
+  .steps li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 12px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: var(--shadow);
+  }
+  .steps .num {
+    flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--red);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+  }
+  .steps p { margin: 0; font-size: .92rem; }
+  .steps strong { font-weight: 800; }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  h1:focus, h2:focus, h3:focus { outline: none; }
+
+  :focus-visible { outline: 2px solid #6f6ac9; outline-offset: 2px; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: .001ms !important;
+      transition-duration: .001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  @media (min-width: 760px) {
+    .app { padding: 0 22px 72px; }
+    .chat-log { height: 420px; }
+    .lead { font-size: 1rem; }
+  }
+</style>
 </head>
 <body>
+<div class="app">
   <header class="topbar">
-    <h1>SINN-KOMPASS: die App zum Sinn des Lebens</h1>
+    <button class="icon-btn" id="backBtn" type="button" aria-label="Zurück" disabled>‹</button>
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="8.5"></circle>
+          <path d="M12 6.5 15 12l-3 5.5L9 12Z"></path>
+        </svg>
+      </span>
+      <div>
+        <h1>whyApp</h1>
+        <p>die App zum Sinn des Lebens</p>
+      </div>
+    </div>
+    <button class="icon-btn" id="helpBtn" type="button" aria-label="So bedienst du die App">?</button>
   </header>
 
-  <main class="layout">
-    <aside class="left-column">
-      <section class="phone panel" aria-label="Startseite">
-        <div class="speaker"></div>
-        <h2>Was gibt dir Sinn?</h2>
-        <div class="tile-grid">
-          <button class="tile family active" data-category="family"><span class="tile-icon">♧</span><span>Freunde &amp;<br>Familie</span></button>
-          <button class="tile hobby" data-category="hobby"><span class="tile-icon">＋⚙</span><span>Hobby</span></button>
-          <button class="tile nature" data-category="nature"><span class="tile-icon">♧</span><span>Natur &amp;<br>Chillen</span></button>
-          <button class="tile faith" data-category="faith"><span class="tile-icon">＋</span><span>Glaube &amp;<br>Religion</span></button>
-          <button class="tile love" data-category="love"><span class="tile-icon">♡</span><span>Liebe</span></button>
-          <button class="tile learning" data-category="learning"><span class="tile-icon">◫</span><span>Lebenslanges<br>Lernen</span></button>
+  <main id="main">
+    <!-- Start -->
+    <section class="view active" id="view-start">
+      <div class="hero">
+        <div class="hero-text">
+          <p class="eyebrow">Willkommen bei whyApp</p>
+          <h2>Was gibt dir Sinn?</h2>
+          <p class="lead">Tippe eine Kachel an. Dahinter steht, warum sie dir helfen kann – und du kannst direkt mit anderen oder mit der Sinnes-KI darüber sprechen.</p>
         </div>
-        <nav class="phone-nav">
-          <button data-view="owner">Chat mit dem Inhaber</button>
-          <button data-view="public">Öffentlicher Chat</button>
-          <button data-view="ai">KI-Sinn-Chat</button>
-        </nav>
-        <div class="dots"><i></i><i></i><i></i></div>
-      </section>
-
-      <section class="panel howto">
-        <h2>So bedienst du die App</h2>
-        <ol>
-          <li><b>1</b><span>Kachel antippen</span></li>
-          <li><b>2</b><span>Kachel mit &gt; = Unterseite</span></li>
-          <li><b>3</b><span>Chat mit dem Inhaber</span></li>
-          <li><b>4</b><span>Pfeil &lt; = zurück zum Start</span></li>
-          <li><b>5</b><span>Öffentlicher Chat (Reddit)</span></li>
-          <li><b>6</b><span>KI-Sinn-Chat mit Plottwist</span></li>
-        </ol>
-        <small>Liebe und Lernen: weitere Angebote</small>
-      </section>
-    </aside>
-
-    <section class="middle-column">
-      <div class="category-grid" id="categoryGrid">
-        <article class="category-card family-card selected" data-card="family">
-          <button class="card-head coral" data-back>‹ <span>Freunde &amp; Familie</span></button>
-          <div class="card-content"><h3>Warum hilft mir das?</h3><ul><li>Du bist nicht allein</li><li>Zusammen lachen und reden</li><li>Menschen, die dich halten</li></ul></div>
-        </article>
-        <article class="category-card hobby-card" data-card="hobby">
-          <button class="card-head mint" data-back>‹ <span>Hobby</span></button>
-          <div class="card-content"><h3>Warum hilft mir das?</h3><ul><li>Etwas, das dir Freude macht</li><li>Du wächst an deinen Zielen</li><li>Zeit, in der du dich spürst</li></ul></div>
-        </article>
-        <article class="category-card nature-card" data-card="nature">
-          <button class="card-head green" data-back>‹ <span>Natur &amp; Chillen</span></button>
-          <div class="card-content"><h3>Warum hilft mir das?</h3><ul><li>Ruhe für den Kopf</li><li>Abstand vom Stress</li><li>Zeit zum Nachdenken</li></ul></div>
-        </article>
-        <article class="category-card faith-card" data-card="faith">
-          <button class="card-head lavender" data-back>‹ <span>Glaube &amp; Religion</span></button>
-          <div class="card-content"><h3>Warum hilft mir das?</h3><ul><li>Antworten auf große Fragen</li><li>Hoffnung und Halt</li><li>Gemeinschaft mit anderen</li></ul></div>
-        </article>
+        <div class="hero-art" id="startArt" aria-hidden="true"></div>
       </div>
-
-      <section class="panel public-panel" id="publicPanel">
-        <div class="section-head blue">‹ <span>Öffentlicher Chat: r/Sinnsuche</span></div>
-        <div class="post">
-          <div class="votes"><button aria-label="Upvote">△</button><strong>42</strong><button aria-label="Downvote">▽</button></div>
-          <div><h3>Was gibt euch im Alltag Sinn?</h3><p><b>u/Lena_8b</b> · 12 Kommentare</p><small>› &nbsp;u/Max: Bei mir ist es Fußball mit dem Team.</small></div>
-        </div>
-        <div class="post">
-          <div class="votes"><button aria-label="Upvote">△</button><strong>27</strong><button aria-label="Downvote">▽</button></div>
-          <div><h3>Habt ihr manchmal Zweifel am Sinn?</h3><p><b>u/Jonas_k</b> · 8 Kommentare</p><small>› &nbsp;u/Sara: Ja, Reden mit Freunden hilft mir.</small></div>
-        </div>
-        <div class="post">
-          <div class="votes"><button aria-label="Upvote">△</button><strong>35</strong><button aria-label="Downvote">▽</button></div>
-          <div><h3>Gibt es einen Sinn für alle?</h3><p><b>u/Emre_9</b> · 15 Kommentare</p><small>› &nbsp;u/Mia: Jeder findet seinen eigenen.</small></div>
-        </div>
-        <form class="compose" id="postForm"><input id="postInput" placeholder="Eigenen Beitrag schreiben ..." aria-label="Eigenen Beitrag schreiben"><button type="submit" aria-label="Beitrag veröffentlichen">➤</button></form>
-      </section>
+      <div class="tiles" id="tiles"></div>
+      <div class="menu" id="menu"></div>
+      <p class="footnote">Nr. 1–2: Kacheln antippen · Nr. 3, 5, 6: Chats · Nr. 4: Pfeil ‹ führt zurück zum Start</p>
+      <div class="heart" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.3S3.5 15.7 3.5 9.8A4.3 4.3 0 0 1 12 8.2a4.3 4.3 0 0 1 8.5 1.6c0 5.9-8.5 10.5-8.5 10.5Z"></path></svg>
+      </div>
     </section>
 
-    <section class="right-column">
-      <section class="panel owner-panel" id="ownerPanel">
-        <div class="section-head gray">‹ <span>Chat mit dem Inhaber</span></div>
-        <div class="chat-history" id="ownerHistory">
-          <div class="bubble incoming">Hi! Was gibt dir persönlich Sinn im Leben?</div>
-          <div class="bubble outgoing">Hi! Für mich sind das Freunde und Familie. Bei ihnen weiß ich, dass ich nicht allein bin.</div>
-          <div class="bubble outgoing">Auch mein Hobby: Wenn ich übe, merke ich, dass ich besser werde. Das gibt mir ein gutes Gefühl.</div>
-          <div class="bubble outgoing">In der Natur ordne ich meine Gedanken. Und Glaube gibt vielen Menschen Hoffnung und Halt.</div>
-          <div class="bubble incoming">Gibt es sonst noch irgendetwas, was Ihnen persönlich Sinn gibt im Leben?</div>
-          <div class="bubble outgoing">Mein Hobby, Fußball, macht mir Spaß, sobald ich merke, dass ich übe und besser werde.</div>
-          <div class="bubble outgoing">Doch ist eine Sache wichtig: Ich finde, dass jeder seinen Sinn selber findet und dass man niemanden nachmachen soll. Die Suche nach dem Sinn ist ein langer Weg und jeder soll seinen eigenen Weg gehen.</div>
-          <div class="bubble incoming thanks">Vielen Dank für Ihre Antworten und Ihre Zeit!</div>
+    <!-- Thema -->
+    <section class="view" id="view-thema">
+      <div class="bar" id="themaBar">
+        <button class="bar-back" type="button" data-back aria-label="Zurück">‹</button>
+        <div>
+          <h2 id="themaTitle" tabindex="-1">Thema</h2>
+          <p class="sub">Deine Kachel im Sinn-Kompass</p>
         </div>
-        <form class="message-form" id="ownerForm"><input id="ownerInput" placeholder="Nachricht schreiben ..." aria-label="Nachricht schreiben"><button type="submit">Senden</button></form>
-      </section>
+      </div>
+      <article class="card">
+        <p class="card-kicker" id="themaKicker">Warum hilft mir das?</p>
+        <ul class="why" id="themaWhy"></ul>
+      </article>
+      <article class="card tip">
+        <p class="card-kicker">Kleiner Tipp</p>
+        <p id="themaTip"></p>
+      </article>
+      <article class="card" id="themaArtCard" hidden>
+        <p class="card-kicker">Ein Bild für den Kopf</p>
+        <div class="art-frame" id="themaArt"></div>
+      </article>
+      <div class="row">
+        <button class="btn primary" type="button" id="frageKi">Die Sinnes-KI dazu fragen</button>
+        <button class="btn" type="button" data-start>Zur Startseite</button>
+      </div>
+    </section>
 
-      <section class="panel ai-panel" id="aiPanel">
-        <div class="section-head orange">‹ <span>KI-Sinn-Chat</span></div>
-        <div class="ai-content" id="aiContent">
-          <div class="bubble incoming">Hallo! Ich bin die Sinn-KI. Ich finde mit dir heraus, was dich im Leben trägt. Was machst du gern?</div>
-          <div class="bubble outgoing">Ich zocke gern und treffe Freunde.</div>
-          <div class="bubble incoming">Wann fühlst du dich am glücklichsten?</div>
-          <div class="bubble outgoing">Wenn wir zusammen lachen.</div>
-          <div class="bubble incoming">Ich merke: Gemeinschaft gibt dir Sinn!</div>
-          <div class="plot-twist"><h2>Plottwist!</h2><p>Jeder deiner Tage hat einen Sinn, auch wenn du ihn gerade nicht verstehst. Du erkennst ihn oft erst später.</p></div>
-          <div class="ai-actions"><button id="againButton">Nochmal fragen</button><button id="homeButton">Zur Startseite</button></div>
+    <!-- Chat mit dem Inhaber -->
+    <section class="view" id="view-inhaber">
+      <div class="bar" style="--c: var(--grey)">
+        <button class="bar-back" type="button" data-back aria-label="Zurück">‹</button>
+        <div>
+          <h2 tabindex="-1">Chat mit dem Inhaber</h2>
+          <p class="sub">Persönlich, direkt, ohne Algorithmus</p>
         </div>
-        <form class="message-form ai-form" id="aiForm"><input id="aiInput" placeholder="Frag die Sinn-KI ..." aria-label="Frag die Sinn-KI"><button type="submit">Senden</button></form>
-      </section>
+      </div>
+      <p class="notice">Beispiel-Verlauf aus dem Konzept. Du kannst hier schreiben – in dieser Demo antwortet ein Autotext.</p>
+      <div class="chat-card">
+        <div class="chat-log" id="ownerLog" aria-live="polite" aria-label="Chatverlauf mit dem Inhaber"></div>
+        <form class="chat-form" id="ownerForm">
+          <label class="sr-only" for="ownerInput">Nachricht an den Inhaber</label>
+          <input id="ownerInput" type="text" placeholder="Nachricht schreiben …" autocomplete="off" maxlength="300">
+          <button class="send" type="submit" aria-label="Nachricht senden">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14M12 6l6 6-6 6"></path></svg>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Öffentlicher Chat -->
+    <section class="view" id="view-public">
+      <div class="bar" style="--c: var(--blue)">
+        <button class="bar-back" type="button" data-back aria-label="Zurück">‹</button>
+        <div>
+          <h2 tabindex="-1">Öffentlicher Chat</h2>
+          <p class="sub">r/Sinnsuche · die Community</p>
+        </div>
+      </div>
+      <div class="post-list" id="postList"></div>
+      <form class="new-post" id="postForm">
+        <label class="sr-only" for="postInput">Eigenen Beitrag schreiben</label>
+        <input id="postInput" type="text" placeholder="Eigenen Beitrag schreiben …" maxlength="140" required>
+        <button class="send" type="submit" aria-label="Beitrag veröffentlichen">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14M12 6l6 6-6 6"></path></svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- KI-Sinn-Chat -->
+    <section class="view" id="view-ki">
+      <div class="bar" style="--c: var(--orange)">
+        <button class="bar-back" type="button" data-back aria-label="Zurück">‹</button>
+        <div>
+          <h2 tabindex="-1">KI-Sinn-Chat</h2>
+          <p class="sub">Frag die Sinnes-KI! …</p>
+        </div>
+      </div>
+      <div class="chat-card ki">
+        <div class="chat-log" id="kiLog" aria-live="polite" aria-label="Chat mit der Sinnes-KI"></div>
+        <form class="chat-form" id="kiForm">
+          <label class="sr-only" for="kiInput">Nachricht an die Sinnes-KI</label>
+          <input id="kiInput" type="text" placeholder="Frag die Sinnes-KI! …" autocomplete="off" maxlength="300">
+          <button class="send" type="submit" aria-label="Nachricht senden">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h14M12 6l6 6-6 6"></path></svg>
+          </button>
+        </form>
+      </div>
+      <p class="ki-note" id="kiNote">Echte KI über eine kostenlose Schnittstelle (Pollinations, ohne Schlüssel). Ist das Gratis-Limit erreicht, antwortet die eingebaute Version.</p>
+      <div class="row">
+        <button class="btn" type="button" id="kiReset">Nochmal fragen</button>
+        <button class="btn" type="button" data-start>Zur Startseite</button>
+      </div>
+    </section>
+
+    <!-- Hilfe -->
+    <section class="view" id="view-hilfe">
+      <div class="bar" style="--c: var(--purple)">
+        <button class="bar-back" type="button" data-back aria-label="Zurück">‹</button>
+        <div>
+          <h2 tabindex="-1">So bedienst du die App</h2>
+          <p class="sub">Alles in sechs Schritten</p>
+        </div>
+      </div>
+      <ol class="steps">
+        <li><span class="num" aria-hidden="true">1</span><p><strong>Kachel antippen</strong> – jedes Thema öffnet sich mit einem Tipp.</p></li>
+        <li><span class="num" aria-hidden="true">2</span><p><strong>Kachel mit ›</strong> – führt zur Unterseite mit „Warum hilft mir das?“.</p></li>
+        <li><span class="num" aria-hidden="true">3</span><p><strong>Chat mit dem Inhaber</strong> – deine Frage landet direkt bei ihm.</p></li>
+        <li><span class="num" aria-hidden="true">4</span><p><strong>Pfeil ‹</strong> – bringt dich immer zurück zum Start.</p></li>
+        <li><span class="num" aria-hidden="true">5</span><p><strong>Öffentlicher Chat</strong> – diskutiere mit in r/Sinnsuche.</p></li>
+        <li><span class="num" aria-hidden="true">6</span><p><strong>KI-Sinn-Chat</strong> – frag die Sinnes-KI, sie fragt nach und am Ende kommt der Plottwist.</p></li>
+      </ol>
+      <p class="footnote">Liebe und Lernen sind weitere Angebote im Kompass. Auf dem Handy wählst du im Browser-Menü „Zum Startbildschirm hinzufügen“ – dann liegt whyApp mit eigenem Icon wie eine App auf dem Handy.</p>
+      <div class="row">
+        <button class="btn primary" type="button" data-start>Zur Startseite</button>
+      </div>
     </section>
   </main>
-  <script src="script.js"></script>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ---------- Icons ---------- */
+  var svg = function (inner) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + inner + '</svg>';
+  };
+
+  var ICONS = {
+    chat: svg('<path d="M20.5 12c0 3.9-3.8 7-8.5 7-1 0-2-.1-2.9-.4L5 20.5l.8-3.2A6.6 6.6 0 0 1 3.5 12c0-3.9 3.8-7 8.5-7s8.5 3.1 8.5 7Z"></path>'),
+    globe: svg('<circle cx="12" cy="12" r="8.5"></circle><path d="M3.5 12h17M12 3.5c2.4 2.4 3.6 5.3 3.6 8.5s-1.2 6.1-3.6 8.5c-2.4-2.4-3.6-5.3-3.6-8.5S9.6 5.9 12 3.5Z"></path>'),
+    spark: svg('<path d="M12 3.5l1.9 5.1 5.1 1.9-5.1 1.9L12 17.5l-1.9-5.1L5 10.5l5.1-1.9L12 3.5Z"></path><path d="M18.6 16.2l.7 1.9 1.9.7-1.9.7-.7 1.9-.7-1.9-1.9-.7 1.9-.7.7-1.9Z"></path>'),
+    freunde: svg('<circle cx="9" cy="8" r="3"></circle><circle cx="17" cy="9.6" r="2.2"></circle><path d="M3.5 19c.6-3 2.7-4.6 5.5-4.6s4.9 1.6 5.5 4.6"></path><path d="M15.3 15c2.3.2 3.9 1.6 4.4 4"></path>'),
+    hobby: svg('<rect x="3" y="4.5" width="18" height="15" rx="4"></rect><path d="M12 8.5v7M8.5 12h7"></path><circle cx="16.8" cy="15.8" r="1.1"></circle>'),
+    natur: svg('<path d="M12 3 5.5 14h13L12 3Z"></path><path d="M12 14v6M9 20h6"></path>'),
+    glaube: svg('<circle cx="12" cy="12" r="4"></circle><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.2 5.2l1.5 1.5M17.3 17.3l1.5 1.5M18.8 5.2l-1.5 1.5M6.7 17.3l-1.5 1.5"></path>'),
+    liebe: svg('<path d="M12 20.3S3.5 15.7 3.5 9.8A4.3 4.3 0 0 1 12 8.2a4.3 4.3 0 0 1 8.5 1.6c0 5.9-8.5 10.5-8.5 10.5Z"></path>'),
+    lernen: svg('<path d="M12 6.5c-1.8-1.4-4-2-6.5-2v13c2.5 0 4.7.6 6.5 2 1.8-1.4 4-2 6.5-2v-13c-2.5 0-4.7.6-6.5 2Z"></path><path d="M12 6.5v13"></path>')
+  };
+
+  /* Das Bild aus der Mitte des Plakats: Sonne über dem Berg, ein Fluss ins Tal */
+  var ARTWORK =
+    '<svg viewBox="0 0 200 170" role="img" aria-label="Bild: Sonne über einem Berg, ein Fluss fließt ins Tal">' +
+      '<rect width="200" height="170" fill="#79c7e8"></rect>' +
+      '<circle cx="104" cy="70" r="30" fill="#f0a63c"></circle>' +
+      '<path d="M0 170 L0 146 L34 116 L58 138 L100 96 L142 138 L166 118 L200 150 L200 170 Z" fill="#23201f"></path>' +
+      '<path d="M98 100 C94 118 110 128 102 144 C98 154 100 162 104 170 L126 170 C120 158 114 148 118 136 C122 122 110 112 110 100 Z" fill="#7fd0ef"></path>' +
+    '</svg>';
+
+  /* ---------- Inhalte ---------- */
+  var THEMEN = {
+    freunde: {
+      nr: 1,
+      titel: 'Freunde & Familie',
+      farbe: 'var(--salmon)',
+      icon: ICONS.freunde,
+      kicker: 'Warum ist das gut für dich?',
+      warum: ['Du bist nicht allein', 'Zusammen lachen und reden', 'Menschen, die dich schätzen'],
+      tipp: 'Schreib heute jemandem, der dir guttut – einfach so, ohne Grund.'
+    },
+    hobby: {
+      nr: 2,
+      titel: 'Hobby',
+      farbe: 'var(--mint)',
+      icon: ICONS.hobby,
+      warum: ['Etwas, das dir Freude macht', 'Du wächst an deinen Zielen', 'Zeit, in der du dich spürst'],
+      tipp: 'Nimm dir 20 Minuten für das, was dir Spaß macht – ohne Ziel und ohne Bewertung.'
+    },
+    natur: {
+      titel: 'Natur & Chillen',
+      farbe: 'var(--green)',
+      icon: ICONS.natur,
+      art: true,
+      warum: ['Ruhe für den Kopf', 'Abstand vom Stress', 'Zeit zum Nachdenken'],
+      tipp: 'Ein Spaziergang ohne Handy wirkt oft mehr als eine Stunde Scrollen.'
+    },
+    glaube: {
+      titel: 'Glaube & Religion',
+      farbe: 'var(--lav)',
+      icon: ICONS.glaube,
+      kicker: 'Wie hilft das?',
+      warum: ['Antworten auf große Fragen', 'Hoffnung und Halt', 'Gemeinschaft mit anderen'],
+      tipp: 'Große Fragen musst du nicht allein lösen – such das Gespräch mit anderen.'
+    },
+    liebe: {
+      titel: 'Liebe',
+      farbe: 'var(--pink)',
+      icon: ICONS.liebe,
+      warum: ['Jemand, der dich versteht', 'Nähe und Geborgenheit', 'Zusammen etwas aufbauen'],
+      tipp: 'Sag jemandem, was er dir bedeutet. Heute ist ein guter Tag dafür.'
+    },
+    lernen: {
+      titel: 'Lebenslanges Lernen',
+      farbe: 'var(--cream)',
+      icon: ICONS.lernen,
+      warum: ['Neues entdecken', 'Dich weiterentwickeln', 'Wissen, das bleibt'],
+      tipp: 'Lerne eine Sache, die du schon lange wissen wolltest – fünf Minuten reichen für den Anfang.'
+    }
+  };
+
+  var REIHENFOLGE = ['freunde', 'hobby', 'natur', 'glaube', 'liebe', 'lernen'];
+
+  var MENU = [
+    { view: 'inhaber', nr: 3, titel: 'Chat mit dem Inhaber', sub: 'persönlich fragen', farbe: 'var(--grey)', icon: ICONS.chat },
+    { view: 'public', nr: 5, titel: 'Öffentlicher Chat', sub: 'r/Sinnsuche', farbe: 'var(--blue)', icon: ICONS.globe },
+    { view: 'ki', nr: 6, titel: 'KI-Sinn-Chat', sub: 'mit Plottwist', farbe: 'var(--orange)', icon: ICONS.spark }
+  ];
+
+  /* ---------- Navigation ---------- */
+  var navStack = [{ view: 'start' }];
+  var currentThema = 'freunde';
+
+  var mainEl = document.getElementById('main');
+  var backBtn = document.getElementById('backBtn');
+
+  function render() {
+    var entry = navStack[navStack.length - 1];
+
+    Array.prototype.forEach.call(document.querySelectorAll('.view'), function (view) {
+      view.classList.remove('active');
+    });
+
+    var view = document.getElementById('view-' + entry.view);
+    if (!view) { return; }
+    view.classList.add('active');
+
+    if (entry.view === 'thema') { fillThema(entry.key || currentThema); }
+
+    backBtn.disabled = navStack.length <= 1;
+
+    var heading = view.querySelector('h2');
+    if (heading) {
+      heading.setAttribute('tabindex', '-1');
+      heading.focus({ preventScroll: true });
+    }
+
+    window.scrollTo(0, 0);
+  }
+
+  function navigate(viewName, key) {
+    navStack.push({ view: viewName, key: key });
+    render();
+  }
+
+  function goBack() {
+    if (navStack.length > 1) { navStack.pop(); }
+    render();
+  }
+
+  function goStart() {
+    navStack = [{ view: 'start' }];
+    render();
+  }
+
+  backBtn.addEventListener('click', goBack);
+  document.getElementById('helpBtn').addEventListener('click', function () { navigate('hilfe'); });
+
+  Array.prototype.forEach.call(document.querySelectorAll('[data-back]'), function (btn) {
+    btn.addEventListener('click', goBack);
+  });
+  Array.prototype.forEach.call(document.querySelectorAll('[data-start]'), function (btn) {
+    btn.addEventListener('click', goStart);
+  });
+
+  /* ---------- Startseite aufbauen ---------- */
+  function buildStart() {
+    var tilesEl = document.getElementById('tiles');
+    var menuEl = document.getElementById('menu');
+
+    document.getElementById('startArt').innerHTML = '<div class="art-frame">' + ARTWORK + '</div>';
+    document.getElementById('themaArt').innerHTML = ARTWORK;
+
+    REIHENFOLGE.forEach(function (key) {
+      var t = THEMEN[key];
+      var tile = document.createElement('button');
+      tile.type = 'button';
+      tile.className = 'tile';
+      tile.style.setProperty('--c', t.farbe);
+      tile.setAttribute('aria-label', 'Thema ' + t.titel + ' öffnen');
+
+      var go = document.createElement('span');
+      go.className = 'tile-go';
+      go.setAttribute('aria-hidden', 'true');
+      go.textContent = '›';
+      tile.appendChild(go);
+
+      if (t.nr) {
+        var nr = document.createElement('span');
+        nr.className = 'nr';
+        nr.setAttribute('aria-hidden', 'true');
+        nr.textContent = t.nr;
+        tile.appendChild(nr);
+      }
+
+      var iconWrap = document.createElement('span');
+      iconWrap.className = 'tile-icon';
+      iconWrap.innerHTML = t.icon;
+      tile.appendChild(iconWrap);
+
+      var title = document.createElement('span');
+      title.className = 'tile-title';
+      title.textContent = t.titel;
+      tile.appendChild(title);
+
+      tile.addEventListener('click', function () {
+        currentThema = key;
+        navigate('thema', key);
+      });
+
+      tilesEl.appendChild(tile);
+    });
+
+    MENU.forEach(function (item) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'menu-item';
+      btn.style.setProperty('--c', item.farbe);
+      btn.setAttribute('aria-label', item.titel + ' öffnen');
+
+      var nr = document.createElement('span');
+      nr.className = 'nr';
+      nr.setAttribute('aria-hidden', 'true');
+      nr.style.position = 'static';
+      nr.style.boxShadow = 'none';
+      nr.textContent = item.nr;
+      btn.appendChild(nr);
+
+      var ico = document.createElement('span');
+      ico.className = 'menu-ico';
+      ico.innerHTML = item.icon;
+      btn.appendChild(ico);
+
+      var label = document.createElement('span');
+      label.className = 'menu-label';
+      label.textContent = item.titel;
+      var sub = document.createElement('small');
+      sub.textContent = item.sub;
+      label.appendChild(sub);
+      btn.appendChild(label);
+
+      var arrow = document.createElement('span');
+      arrow.className = 'arrow';
+      arrow.setAttribute('aria-hidden', 'true');
+      arrow.textContent = '›';
+      btn.appendChild(arrow);
+
+      btn.addEventListener('click', function () { navigate(item.view); });
+      menuEl.appendChild(btn);
+    });
+  }
+
+  /* ---------- Themenseite ---------- */
+  function fillThema(key) {
+    var t = THEMEN[key] || THEMEN.freunde;
+
+    document.getElementById('themaTitle').textContent = t.titel;
+    document.getElementById('themaBar').style.setProperty('--c', t.farbe);
+    document.getElementById('themaTip').textContent = t.tipp;
+    document.getElementById('themaKicker').textContent = t.kicker || 'Warum hilft mir das?';
+    document.getElementById('themaArtCard').hidden = !t.art;
+
+    var list = document.getElementById('themaWhy');
+    list.innerHTML = '';
+    t.warum.forEach(function (punkt) {
+      var li = document.createElement('li');
+      li.textContent = punkt;
+      list.appendChild(li);
+    });
+  }
+
+  document.getElementById('frageKi').addEventListener('click', function () {
+    var thema = THEMEN[currentThema].titel;
+    resetKi();
+    navigate('ki');
+    setTimeout(function () {
+      kiSubmit('Erzähl mir mehr über ' + thema + '.');
+    }, 320);
+  });
+
+  /* ---------- Chat-Helfer ---------- */
+  function addBubble(log, who, text) {
+    var el = document.createElement('div');
+    el.className = 'msg ' + (who === 'me' ? 'me' : 'bot');
+    el.textContent = text;
+    log.appendChild(el);
+    log.scrollTop = log.scrollHeight;
+    return el;
+  }
+
+  /* ---------- Chat mit dem Inhaber ---------- */
+  var ownerLog = document.getElementById('ownerLog');
+  var ownerForm = document.getElementById('ownerForm');
+  var ownerInput = document.getElementById('ownerInput');
+
+  var OWNER_START = [
+    { who: 'bot', text: 'Hi! Was gibt Ihnen persönlich Sinn im Leben?' },
+    { who: 'me', text: 'Hi! Für mich sind das Freunde und Familie. Bei ihnen weiß ich, dass ich nicht allein bin.' },
+    { who: 'bot', text: 'Gibt es sonst noch irgendetwas, was Ihnen Sinn gibt im Leben?' },
+    { who: 'me', text: 'Mein Hobby, Fußball, macht mir Spaß, sobald ich merke, dass ich übe und besser werde. Jedoch ist eine Sache wichtig: Ich finde, dass jeder seinen Sinn selber findet und dass man niemanden nachmachen soll. Die Suche nach dem Sinn ist ein langer Weg und jeder soll seinen eigenen Weg gehen.' },
+    { who: 'bot', text: 'Vielen Dank für Ihre Antworten und Ihre Zeit!' }
+  ];
+
+  var OWNER_REPLIES = [
+    'Danke für deine Nachricht! In dieser Demo antworte ich automatisch – in der echten App schreibe ich hier selbst zurück.',
+    'Schön, dass du da bist. Was beschäftigt dich gerade am meisten?',
+    'Ich lese jede Nachricht, auch wenn ich nicht immer sofort antworte.',
+    'Halt durch – und sprich mit jemandem, dem du vertraust. Das hilft mehr als jede Antwort von mir.'
+  ];
+  var ownerReplyIndex = 0;
+
+  OWNER_START.forEach(function (msg) { addBubble(ownerLog, msg.who, msg.text); });
+
+  ownerForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var text = ownerInput.value.trim();
+    if (!text) { return; }
+
+    addBubble(ownerLog, 'bot', text);
+    ownerInput.value = '';
+
+    setTimeout(function () {
+      addBubble(ownerLog, 'me', OWNER_REPLIES[ownerReplyIndex % OWNER_REPLIES.length]);
+      ownerReplyIndex += 1;
+    }, 800);
+  });
+
+  /* ---------- Sinnes-KI ---------- */
+  var kiLog = document.getElementById('kiLog');
+  var kiForm = document.getElementById('kiForm');
+  var kiInput = document.getElementById('kiInput');
+
+  var KI = { history: [], turns: 0, talk: 0, plotShown: false, busy: false, seq: 0 };
+
+  var KI_API = 'https://text.pollinations.ai/openai';
+  var KI_MODEL = 'openai-fast';
+  var KI_NOTE_DEFAULT = 'Echte KI über eine kostenlose Schnittstelle (Pollinations, ohne Schlüssel). Ist das Gratis-Limit erreicht, antwortet die eingebaute Version.';
+  var KI_NOTE_FALLBACK = 'Die kostenlose KI hat gerade ihr Limit erreicht (pro Besucher begrenzt). Ich antworte mit den eingebauten Sätzen – in ein paar Minuten klappt es wieder.';
+
+  var KI_SYSTEM = [
+    'Du bist die Sinnes-KI in der App "whyApp – die App zum Sinn des Lebens".',
+    'Du sprichst warm, ruhig und auf Augenhöhe, auf Deutsch und per du.',
+    'Deine Aufgabe: zuhören, behutsam nachfragen und helfen, eigene Werte, Menschen und kleine Schritte zu entdecken.',
+    'Antworte in 2 bis 4 kurzen Sätzen und stelle höchstens eine Frage.',
+    'Beziehe dich auf das, was die Person geschrieben hat, ohne es wörtlich zu wiederholen.',
+    'Keine Diagnosen, keine Therapieversprechen, keine Medikamenten- oder Rechtsberatung.',
+    'Wenn jemand in einer Krise steckt, sage freundlich, dass Hilfe vor Ort gut tut, und nenne die Telefonseelsorge 0800 111 0 111.',
+    'Keine Listen, keine Überschriften, keine Emojis.'
+  ].join(' ');
+
+  var kiNoteEl = document.getElementById('kiNote');
+  var kiSendBtn = kiForm.querySelector('button[type="submit"]');
+
+  var WORTE = [
+    { wort: 'Gemeinschaft', keys: ['freund', 'familie', 'mama', 'papa', 'eltern', 'bruder', 'schwester', 'team', 'zusammen', 'menschen', 'lachen', 'reden', 'rede', 'treffen'] },
+    { wort: 'Bewegung', keys: ['sport', 'fußball', 'fussball', 'laufen', 'joggen', 'gym', 'tanzen', 'schwimmen', 'rad', 'yoga', 'klettern'] },
+    { wort: 'kreativen Ausdruck', keys: ['musik', 'gitarre', 'klavier', 'singen', 'malen', 'zeichnen', 'kunst', 'schreiben', 'basteln', 'foto', 'theater'] },
+    { wort: 'Natur', keys: ['natur', 'wald', 'meer', 'see', 'berg', 'wandern', 'garten', 'spazieren', 'draußen', 'draussen', 'tier'] },
+    { wort: 'Neugier', keys: ['lesen', 'buch', 'lernen', 'schule', 'studium', 'programm', 'zocken', 'game', 'spiel', 'reise', 'entdeck'] },
+    { wort: 'Halt', keys: ['glaube', 'gott', 'kirche', 'religion', 'medit', 'beten', 'spiritual', 'hoffnung'] },
+    { wort: 'Zuneigung', keys: ['liebe', 'partner', 'beziehung', 'nähe', 'umarm', 'zärtlich', 'geborgen'] }
+  ];
+
+  var KI_TALK = [
+    'Erzähl mir mehr – was genau fühlst du dabei?',
+    'Ich höre dir zu. Was gibt dir davon am meisten Kraft?',
+    'Und was würdest du jemandem raten, der gerade keinen Sinn sieht?'
+  ];
+
+  function detectTheme(text) {
+    var t = text.toLowerCase();
+    for (var i = 0; i < WORTE.length; i += 1) {
+      for (var j = 0; j < WORTE[i].keys.length; j += 1) {
+        if (t.indexOf(WORTE[i].keys[j]) !== -1) { return WORTE[i].wort; }
+      }
+    }
+    return null;
+  }
+
+  function addPlot() {
+    var card = document.createElement('div');
+    card.className = 'plot';
+    card.innerHTML = '<h3>Plottwist!</h3><p>Jeder deiner Tage hat einen Sinn, auch wenn du ihn gerade nicht verstehst. Du erkennst ihn oft erst später.</p>';
+    kiLog.appendChild(card);
+    kiLog.scrollTop = kiLog.scrollHeight;
+  }
+
+  function resetKi() {
+    KI.history = [];
+    KI.turns = 0;
+    KI.talk = 0;
+    KI.plotShown = false;
+    KI.seq += 1;
+    kiLog.innerHTML = '';
+    setKiBusy(false);
+    kiNote(false);
+    addBubble(kiLog, 'bot', 'Hallo! Ich bin die Sinnes-KI. Ich finde mit dir heraus, was dich im Leben trägt. Was machst du gern?');
+  }
+
+  function setKiBusy(busy) {
+    KI.busy = busy;
+    if (kiSendBtn) { kiSendBtn.disabled = busy; }
+  }
+
+  function kiNote(isFallback) {
+    if (!kiNoteEl) { return; }
+    kiNoteEl.textContent = isFallback ? KI_NOTE_FALLBACK : KI_NOTE_DEFAULT;
+    kiNoteEl.classList.toggle('warn', !!isFallback);
+  }
+
+  function showTyping() {
+    var el = document.createElement('div');
+    el.className = 'msg bot typing';
+    el.setAttribute('aria-label', 'Die Sinnes-KI schreibt');
+    el.innerHTML = '<span></span><span></span><span></span>';
+    kiLog.appendChild(el);
+    kiLog.scrollTop = kiLog.scrollHeight;
+    return el;
+  }
+
+  function localReply() {
+    var userText = KI.history
+      .filter(function (m) { return m.role === 'user'; })
+      .map(function (m) { return m.content; })
+      .join(' ');
+    var wort = detectTheme(userText);
+
+    if (KI.turns === 1) {
+      return (wort ? '„' + wort + '“ klingt stark. ' : 'Danke, dass du das teilst. ') +
+        'Wann fühlst du dich am glücklichsten?';
+    }
+    if (KI.turns === 2) {
+      return wort
+        ? 'Ich merke: ' + wort + ' gibt dir Sinn!'
+        : 'Ich merke: Bei dir zählt, was du selbst erlebst – nicht, was andere erwarten.';
+    }
+    var reply = KI_TALK[KI.talk % KI_TALK.length];
+    KI.talk += 1;
+    return reply;
+  }
+
+  function callKi(messages) {
+    var controller = new AbortController();
+    var timer = setTimeout(function () { controller.abort(); }, 20000);
+
+    return fetch(KI_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ model: KI_MODEL, messages: messages, temperature: 0.8 }),
+      signal: controller.signal
+    }).then(function (res) {
+      if (!res.ok) {
+        var retryAfter = parseInt(res.headers.get('retry-after') || '', 10);
+        var error = new Error('HTTP ' + res.status);
+        error.status = res.status;
+        error.retryAfter = isNaN(retryAfter) ? 0 : retryAfter;
+        throw error;
+      }
+      return res.json();
+    }).then(function (data) {
+      var msg = data && data.choices && data.choices[0] && data.choices[0].message;
+      var content = msg && typeof msg.content === 'string' ? msg.content.trim() : '';
+      if (!content) { throw new Error('Leere Antwort'); }
+      return content;
+    }).then(function (answer) {
+      clearTimeout(timer);
+      return answer;
+    }, function (error) {
+      clearTimeout(timer);
+      throw error;
+    });
+  }
+
+  /* Das Gratis-Kontingent ist pro Besucher begrenzt. Bei 402/429/Serverfehlern
+     warten wir kurz und versuchen es genau einmal erneut. */
+  function askKi() {
+    var messages = [{ role: 'system', content: KI_SYSTEM }].concat(KI.history.slice(-10));
+
+    return callKi(messages).catch(function (error) {
+      if (!error || error.name === 'AbortError') { throw error; }
+
+      var status = error.status || 0;
+      var retryable = status === 0 || status === 402 || status === 429 || status >= 500;
+      if (!retryable) { throw error; }
+
+      var wait = error.retryAfter > 0 ? Math.min(error.retryAfter, 15) : 6;
+
+      return new Promise(function (resolve, reject) {
+        setTimeout(function () {
+          callKi(messages).then(resolve, reject);
+        }, wait * 1000);
+      });
+    });
+  }
+
+  function finishKiTurn() {
+    setKiBusy(false);
+    if (KI.turns >= 2 && !KI.plotShown) {
+      KI.plotShown = true;
+      setTimeout(addPlot, 500);
+    }
+  }
+
+  function kiSubmit(text) {
+    if (KI.busy) { return; }
+
+    addBubble(kiLog, 'me', text);
+    KI.history.push({ role: 'user', content: text });
+    KI.turns += 1;
+    setKiBusy(true);
+
+    var typing = showTyping();
+    var seq = KI.seq;
+
+    askKi().then(function (answer) {
+      if (seq !== KI.seq) { return; }
+      if (typing.parentNode) { typing.parentNode.removeChild(typing); }
+      addBubble(kiLog, 'bot', answer);
+      KI.history.push({ role: 'assistant', content: answer });
+      kiNote(false);
+      finishKiTurn();
+    }).catch(function () {
+      if (seq !== KI.seq) { return; }
+      if (typing.parentNode) { typing.parentNode.removeChild(typing); }
+      var fallback = localReply();
+      addBubble(kiLog, 'bot', fallback);
+      KI.history.push({ role: 'assistant', content: fallback });
+      kiNote(true);
+      finishKiTurn();
+    });
+  }
+
+  kiForm.addEventListener('submit', function (event) {
+    event.preventDefault();
+    var text = kiInput.value.trim();
+    if (!text || KI.busy) { return; }
+    kiInput.value = '';
+    kiSubmit(text);
+  });
+
+  document.getElementById('kiReset').addEventListener('click', resetKi);
+
+  /* ---------- Öffentlicher Chat ---------- */
+  var posts = [
+    {
+      id: 1,
+      title: 'Was gibt euch im Alltag Sinn?',
+      author: 'u/Lena_8b',
+      votes: 42,
+      voted: false,
+      total: 12,
+      open: false,
+      comments: [
+        { author: 'u/Max', text: 'Bei mir ist es Fußball mit dem Team.' },
+        { author: 'u/Lea_97', text: 'Kochen für andere – da merke ich, dass ich gebraucht werde.' }
+      ]
+    },
+    {
+      id: 2,
+      title: 'Habt ihr manchmal Zweifel am Sinn?',
+      author: 'u/Jonas_k',
+      votes: 27,
+      voted: false,
+      total: 8,
+      open: false,
+      comments: [
+        { author: 'u/Sara', text: 'Ja, Reden mit Freunden hilft mir.' },
+        { author: 'u/Tim', text: 'Mir hilft Tagebuchschreiben.' }
+      ]
+    },
+    {
+      id: 3,
+      title: 'Gibt es einen Sinn für alle?',
+      author: 'u/Emre_9',
+      votes: 35,
+      voted: false,
+      total: 15,
+      open: false,
+      comments: [
+        { author: 'u/Mia', text: 'Jeder findet seinen eigenen.' },
+        { author: 'u/Noah', text: 'Vielleicht ist der Sinn, dass wir ihn suchen.' }
+      ]
+    }
+  ];
+
+  var postList = document.getElementById('postList');
+
+  function renderPosts() {
+    postList.innerHTML = '';
+
+    posts.forEach(function (post) {
+      var article = document.createElement('article');
+      article.className = 'post';
+
+      var vote = document.createElement('button');
+      vote.type = 'button';
+      vote.className = 'vote' + (post.voted ? ' on' : '');
+      vote.setAttribute('aria-pressed', post.voted ? 'true' : 'false');
+      vote.setAttribute('aria-label', 'Beitrag hochwählen, ' + post.votes + ' Stimmen');
+      vote.innerHTML = '<span class="arrow" aria-hidden="true">▲</span><span>' + post.votes + '</span>';
+      vote.addEventListener('click', function () {
+        post.voted = !post.voted;
+        post.votes += post.voted ? 1 : -1;
+        renderPosts();
+      });
+      article.appendChild(vote);
+
+      var body = document.createElement('div');
+
+      var title = document.createElement('h3');
+      title.textContent = post.title;
+      body.appendChild(title);
+
+      var meta = document.createElement('p');
+      meta.className = 'post-meta';
+      meta.textContent = post.author + ' · ' + post.total + ' Kommentare';
+      body.appendChild(meta);
+
+      var toggle = document.createElement('button');
+      toggle.type = 'button';
+      toggle.className = 'comments-toggle';
+      toggle.setAttribute('aria-expanded', post.open ? 'true' : 'false');
+      toggle.textContent = (post.open ? '‣ Kommentare ausblenden' : '› Kommentare anzeigen');
+      toggle.addEventListener('click', function () {
+        post.open = !post.open;
+        renderPosts();
+      });
+      body.appendChild(toggle);
+
+      if (post.open) {
+        var wrap = document.createElement('div');
+        wrap.className = 'comments';
+
+        post.comments.forEach(function (comment) {
+          var p = document.createElement('p');
+          p.className = 'comment';
+          var strong = document.createElement('strong');
+          strong.textContent = comment.author;
+          p.appendChild(document.createTextNode('› '));
+          p.appendChild(strong);
+          p.appendChild(document.createTextNode(': ' + comment.text));
+          wrap.appendChild(p);
+        });
+
+        var rest = post.total - post.comments.length;
+        if (rest > 0) {
+          var more = document.createElement('p');
+          more.className = 'more';
+          more.textContent = '… ' + rest + ' weitere Kommentare aus der Community';
+          wrap.appendChild(more);
+        }
+
+        var form = document.createElement('form');
+        form.className = 'comment-form';
+        var input = document.createElement('input');
+        input.type = 'text';
+        input.placeholder = 'Antwort schreiben …';
+        input.maxLength = 200;
+        input.setAttribute('aria-label', 'Antwort auf diesen Beitrag');
+        var send = document.createElement('button');
+        send.type = 'submit';
+        send.textContent = 'Senden';
+        form.appendChild(input);
+        form.appendChild(send);
+
+        form.addEventListener('submit', function (event) {
+          event.preventDefault();
+          var text = input.value.trim();
+          if (!text) { return; }
+          post.comments.push({ author: 'u/du', text: text });
+          post.total += 1;
+          post.open = true;
+          renderPosts();
+        });
+
+        wrap.appendChild(form);
+        body.appendChild(wrap);
+      }
+
+      article.appendChild(body);
+      postList.appendChild(article);
+    });
+  }
+
+  document.getElementById('postForm').addEventListener('submit', function (event) {
+    event.preventDefault();
+    var input = document.getElementById('postInput');
+    var text = input.value.trim();
+    if (!text) { return; }
+
+    posts.unshift({
+      id: Date.now(),
+      title: text,
+      author: 'u/du',
+      votes: 1,
+      voted: true,
+      total: 0,
+      open: false,
+      comments: []
+    });
+
+    input.value = '';
+    renderPosts();
+  });
+
+  /* ---------- Start ---------- */
+  buildStart();
+  renderPosts();
+  resetKi();
+
+  /* ---------- Installierbar als App (PWA) ---------- */
+  if ('serviceWorker' in navigator && location.protocol.indexOf('http') === 0) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () { /* z. B. beim Öffnen ohne Server */ });
+    });
+  }
+})();
+</script>
 </body>
 </html>
