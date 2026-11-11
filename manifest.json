@@ -1,0 +1,17 @@
+{
+  "name": "whyApp – die App zum Sinn des Lebens",
+  "short_name": "whyApp",
+  "description": "Sechs Themen, ein Chat mit dem Inhaber, ein öffentlicher Chat und die Sinnes-KI mit Plottwist.",
+  "lang": "de",
+  "start_url": "index.html",
+  "scope": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fdfbf6",
+  "theme_color": "#8b86e0",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
